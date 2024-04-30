@@ -1,19 +1,24 @@
 import express from 'express'
 import connectDB from './db/index.js';
 import dotenv from "dotenv"
+import app from '../src/app.js';
+
+// const app = express();
 
 dotenv.config({
     path : "./.env"
 })
-const app = express();
+// console.log(app);
 
-app.get("/",(req,res)=>{
-    res.send("Test fnrom backend")
+
+connectDB()
+.then((res)=>{
+    app.listen(8000,function (params) {
+        console.log("App is listenting on port "+8000)
+    })
+})
+.catch((err)=>{
+    console.log("Error || ",err)
 })
 
-connectDB();
 
-
-app.listen(8000,function (params) {
-    console.log("App is listenting on port "+8000)
-})

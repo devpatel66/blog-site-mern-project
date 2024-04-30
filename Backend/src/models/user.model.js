@@ -27,7 +27,6 @@ const userSchema = Schema({
     },
     avatar : {
         type : String,
-        required : true,
     },
     refreshToken : {
         type : String
@@ -35,9 +34,10 @@ const userSchema = Schema({
 
 },{timestamps : true})
 
-userSchema.pre('save',async function(){
+userSchema.pre('save',async function(next){
     if(this.isModified("password")){
-        this.password = bcrypt.hash(this.password,10)
+        this.password = await bcrypt.hash(this.password,10)
+        next();
     }
 })
 
@@ -62,7 +62,7 @@ userSchema.methods.generateAccessToken = function() {
     )
 }
 
-userSchema.methods.generateAccessToken = function() {
+userSchema.methods.generateRefreshToken = function() {
     return jwt.sign(
         {
             _id : this._id,
