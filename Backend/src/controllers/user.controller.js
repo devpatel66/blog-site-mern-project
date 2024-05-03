@@ -95,7 +95,7 @@ const options = {
 //login controller 
 const loginUser = asyncHandler(async (req,res)=>{
     const {username,email,password} = req.body;
-
+    // console.log(req.body)
     if(!(username || email)){
         throw new Apierror(400,"Username or Email is required")
     }
@@ -105,13 +105,13 @@ const loginUser = asyncHandler(async (req,res)=>{
     }
 
     const user = await User.findOne({
-        $or : [{username,email}]
+        $or : [{username},{email}]
     })
 
+    // console.log(user)
     if(!user){
         throw new Apierror(401,"User does not exists")
     }
-
     const isPasswordvalid = await user.isPassword(password)
 
     if(!isPasswordvalid){
@@ -132,5 +132,6 @@ const loginUser = asyncHandler(async (req,res)=>{
 })
 
 export {
-    registeredUser
+    registeredUser,
+    loginUser
 }
