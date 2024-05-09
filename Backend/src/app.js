@@ -1,13 +1,13 @@
 import cookieParse from 'cookie-parser';
-// import cros from 'cros'
+import cors from 'cors'
 
 import express from 'express'
 
 const app = express();
 
-// app.use(cros({
-//     origin: '*',
-//   }))
+app.use(cors({
+    origin: '*',
+  }))
 
 app.use(cookieParse());
 
