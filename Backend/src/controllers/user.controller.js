@@ -11,23 +11,33 @@ const registeredUser = asyncHandler(async function(req,res){
     console.log(req.body)
     // console.log(avatarPath)
     if(fullname == ""){
-        throw new Apierror(400,"Full name is required")
+        return res.status(404).json(
+            new ApiResponse(404,"","Fullname required")
+        )
     }
 
     if(username == ""){
-        throw new Apierror(400,"Username is required")
+        return res.status(405).json(
+            new ApiResponse(405,"","Username required")
+        )
     }
 
     if(email == ""){
-        throw new Apierror(400,"Email is required")
+        return res.status(400).json(
+            new ApiResponse(400,"","Email required")
+        )
     }
 
     if(password == ""){
-        throw new Apierror(400,"Password is required")
+        return res.status(403).json(
+            new ApiResponse(403,"","Password required")
+        )
     }
 
     if(String(password).length <= 7){
-        throw new Apierror(401,"Password length should be more than 7")
+        return res.status(403).json(
+            new ApiResponse(403,"","Password must be more than 7 letters")
+        )
     }
 
 
@@ -37,11 +47,15 @@ const registeredUser = asyncHandler(async function(req,res){
     const existedEmail = await User.findOne({email})
 
     if(existedEmail){
-        throw new Apierror(400,"Email already existed")
+        return res.status(400).json(
+            new ApiResponse(400,"","Email already exists")
+        )
     }
     
     if(existedUserName){
-        throw new Apierror(400,"Username already taken like your crush !!!")
+        return res.status(405).json(
+            new ApiResponse(405,"","Username already exits")
+        )
     }
 
     // if(!avatarPath){
@@ -61,6 +75,12 @@ const registeredUser = asyncHandler(async function(req,res){
     }
 
     const user = await User.create(userData)
+
+    if(!user){
+        return res.status(500).json(
+            new ApiResponse(500,"","Internal Server Error")
+        )
+    }
 
     const createdUser = await User.findOne(user._id).select("-password -refreshToken");
 
@@ -95,13 +115,19 @@ const options = {
 //login controller 
 const loginUser = asyncHandler(async (req,res)=>{
     const {username,email,password} = req.body;
-    // console.log(req.body)
+    console.log(req.body)
     if(!(username || email)){
-        throw new Apierror(400,"Username or Email is required")
+        return res.status(402)
+        .json(
+            new ApiResponse(402,"","Username or Email required")
+        )
     }
 
     if(!password){
-        throw new Apierror(400,"Password is required")
+        return res.status(403)
+        .json(
+            new ApiResponse(403,"","Password required")
+        )
     }
 
     const user = await User.findOne({
@@ -110,20 +136,27 @@ const loginUser = asyncHandler(async (req,res)=>{
 
     // console.log(user)
     if(!user){
-        throw new Apierror(401,"User does not exists")
+        return res.status(401)
+        .json(
+            new ApiResponse(401,"","User does not exits check your Email or Username")
+        )
     }
     const isPasswordvalid = await user.isPassword(password)
 
     if(!isPasswordvalid){
-        throw new Apierror(401,"Invalid password")
+        return res.status(403)
+        .json(
+            new ApiResponse(403,"","Invalid Password")
+        )
     }
 
     const {accessToken,refreshToken} = await generateTokens(user._id);
 
     const loggedInUser = await User.findOne(user._id).select("-password -refreshTOken")
 
+
+    res.cookie("accessToken",accessToken,options)
     return res.status(200)
-    .cookie("accessToken",accessToken,options)
     .cookie("refreshToken",refreshToken,options)
     .json(
         new ApiResponse(200,{accessToken,refreshToken,user:loggedInUser},"User logged in successfully")
