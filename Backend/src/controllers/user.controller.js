@@ -108,6 +108,7 @@ const generateTokens = async (userId)=>{
 
 //cookies options
 const options = {
+    domain: 'demo.blogis.com',
     httpOnly : true,
     secure : true
 }
