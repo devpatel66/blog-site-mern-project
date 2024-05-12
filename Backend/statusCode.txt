@@ -1,0 +1,5 @@
+400 : Email error 
+401 : If user not found from database 
+403 : Password error
+404 : Fullname error
+405 : username error
