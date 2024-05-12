@@ -1,45 +1,64 @@
 import Input from '../tags/input'
 import {NavLink} from 'react-router-dom'
-import { useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import userAuth from '../Api/userApi'
+
 function Login() {
   const formRef = useRef(null)
+  const [errorMsg,setError] = useState(null)
+  const [errorPwdMsg,setPwdError] = useState(null)
 
-  const handleSubmit = (e)=>{
+  const handleSubmit = async (e)=>{
     e.preventDefault();
     const formData = new FormData(formRef.current);
     const data = {
-      email : formData.get("email"),
-      password : formData.get("password")
+      email : String(formData.get("email")),
+      password : String(formData.get("password"))
     }
 
-    console.log(data);
+    const response = await userAuth.login(data)
+    if(response.statusCode == 401) {
+      setError(response.message)
+    }
+    else if(response.statusCode == 403) {
+      setPwdError("* "+response.message)
+    }
+    console.log(response);
   }
+
+  useEffect(()=>{
+    if(errorMsg){
+      setTimeout(()=>{
+        setError(null)
+      },3000)
+    }
+  },[errorMsg])
   
-  console.log(formRef);
+  // console.log(formRef);
   return (
     <div className="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-sm">
         <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">Sign in to your account</h2>
       </div>
-
-      <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
+      <div className="sm:mx-auto sm:w-full sm:max-w-sm mt-6">
+        <h2 className="text-center text-l bg-red-200 font-bold leading-9 tracking-tight text-red-600">{errorMsg}</h2>
+      </div>
+      <div className="mt-4 sm:mx-auto sm:w-full sm:max-w-sm">
         <form className="space-y-6" ref={formRef}>
           <div>
             <label htmlFor="email" className="block text-sm font-medium leading-6 text-gray-900">Email address</label>
             <div className="mt-2">
-              {/* <input id="email" name="email" type="email" autoComplete="email" required className="block w-full rounded-md border-0 text-gray-900 px-4 py-2 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" /> */}
               <Input id="email" name="email" type="email"/>
             </div>
           </div>
 
           <div>
             <div className="flex items-center justify-between">
-              <label htmlFor="password" className="block text-sm font-medium leading-6 text-gray-900">Password</label>
-              <div className="text-sm">
-                <a href="#" className="font-semibold text-indigo-600 hover:text-indigo-500">Forgot password?</a>
-              </div>
+              
             </div>
             <div className="mt-2">
+            <label htmlFor="password" className="block text-sm font-medium leading-6 text-gray-900">Password</label>
+            <h2 className={`text-left text-l font-bold leading-9 tracking-tight text-red-600 ${errorPwdMsg ? "block" : "hidden"}`}>{errorPwdMsg}</h2>
               <Input id="password" name="password" type="password"/>
             </div>
           </div>
