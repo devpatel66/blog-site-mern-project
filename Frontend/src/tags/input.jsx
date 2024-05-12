@@ -1,4 +1,4 @@
-import React from 'react'
+/* eslint-disable react/prop-types */
 
 function Input({id,name,className="",type="text"}) {
   return (

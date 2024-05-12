@@ -1,48 +1,105 @@
 import Input from '../tags/input'
-import { NavLink } from 'react-router-dom'
-import { useRef, useState } from 'react'
+import { NavLink,useNavigate } from 'react-router-dom'
+import { useEffect, useRef, useState } from 'react'
 import userAuth from '../Api/userApi'
 
 function Register() {
   const formRef = useRef(null)
-  const [usernameError, setUsernameError] = useState("");
-  const [emailError, setEmailError] = useState("");
-  const [passwordError, setPasswordError] = useState("");
-  const [serverError, setServerError] = useState("");
-  const [fullnameError, setFullnameError] = useState("");
-
-
+  const [userData,setUserData] = useState(null)
+  const [usernameError, setUsernameError] = useState(true);
+  const [emailError, setEmailError] = useState(true);
+  const [passwordError, setPasswordError] = useState(true);
+  const [serverError, setServerError] = useState(true);
+  const [fullnameError, setFullnameError] = useState(true);
+  const navigate = useNavigate()
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
     const formData = new FormData(formRef.current);
-    const data = {
-      fullname: formData.get("fullname"),
-      username: formData.get("username"),
-      email: formData.get("email"),
-      password: formData.get("password")
+    if(!formData.get("fullname")){
+      setFullnameError("Fullname is reuired")
     }
-    let response = await userAuth.RegisterUser(data)
-
-    if (response.statusCode == 405) {
-      setUsernameError(response.message)
-    }
-    else if (response.statusCode == 400) {
-      setEmailError(response.message)
-    }
-    else if (response.statusCode == 403) {
-      setPasswordError(response.message)
-    }
-    else if (response.statusCode == 500) {
-      setServerError(response.message)
-    }
-    else if (response.statusCode == 404) {
-      setFullnameError(response.message)
+    else{
+      setFullnameError("")
     }
 
+    if(!formData.get("username")){
+      setUsernameError("Username is reuired")
+    }
+    else{
+      setUsernameError("")
+    }
+    if(!formData.get("email")){
+      setEmailError("Email is reuired")
+    }
+    else{
+      setEmailError("")
+    }
 
+    if(!formData.get("password")){
+      setPasswordError("Password is reuired")
+    }
+    else{
+      setPasswordError("")
+    }
 
-    console.log(response);
+    
+
+      const data = {
+        fullname: formData.get("fullname"),
+        username: formData.get("username"),
+        email: formData.get("email"),
+        password: formData.get("password")
+      }
+  
+      setUserData(data)
+    
   }
+
+  useEffect(()=>{
+    async function registerUser(){
+      let validate = false;
+      if(passwordError || fullnameError || emailError || usernameError){
+        validate = false
+        console.log("false hai");
+      }
+      else{
+        console.log("true hai");
+        validate= true
+      }
+      if(validate){
+        console.log("validate");
+        console.log(userData)
+        let response = await userAuth.RegisterUser(userData)
+        
+        if (response.statusCode == 405) {
+          setUsernameError(response.message)
+        }
+        else if (response.statusCode == 400) {
+          setEmailError(response.message)
+        }
+        else if (response.statusCode == 403) {
+          setPasswordError(response.message)
+        }
+        else if (response.statusCode == 500) {
+          setServerError(response.message)
+        }
+        else if (response.statusCode == 404) {
+          setFullnameError(response.message)
+        }
+    
+    
+    
+        console.log(response);
+        
+        if(response.statusCode == 200){
+          navigate("/login")
+        }
+      }
+
+    }
+    registerUser()
+  },[passwordError,emailError,fullnameError,usernameError])
   return (
     <div className="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-sm">
@@ -87,7 +144,7 @@ function Register() {
           </div>
 
           <div className='flex justify-center'>
-            <button onClick={(e) => handleSubmit(e)} type="submit" className="flex w-full justify-center rounded-md bg-indigo-600 w-fit px-4 py-2 text-xl font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 ">Sign Up</button>
+            <button onClick={(e) => handleSubmit(e)} type="submit" className="flex w-full justify-center rounded-md bg-indigo-600 px-4 py-2 text-xl font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 ">Sign Up</button>
           </div>
         </form>
 
