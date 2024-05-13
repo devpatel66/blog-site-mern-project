@@ -3,19 +3,32 @@ import {createBrowserRouter,RouterProvider} from 'react-router-dom'
 import './index.css'
 import {Login, Register} from './Pages/index.js'
 import App from './App.jsx'
+import {Provider} from 'react-redux'
+import store from './store/store.js'
+import AuthLayout from './AuthLayout.jsx'
 
 const router = createBrowserRouter([{
   path : "/",
   element : <App/>,
   children : [{
     path : "login",
-    element : <Login/>
+    element : (
+    <AuthLayout authencation={false}>
+      <Login/>
+    </AuthLayout>
+    )
   },
   {
     path : "register",
-    element : <Register/>
+    element : (
+      <AuthLayout authencation={false}>
+        <Register/>
+      </AuthLayout>
+      )
   }]
 }])
 ReactDOM.createRoot(document.getElementById('root')).render(
-  <RouterProvider router={router}/>
+  <Provider store={store}>
+    <RouterProvider router={router}/>
+  </Provider>
 )
