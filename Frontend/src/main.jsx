@@ -6,6 +6,7 @@ import App from './App.jsx'
 import {Provider} from 'react-redux'
 import store from './store/store.js'
 import AuthLayout from './AuthLayout.jsx'
+import AddPost from './Pages/AddPost.jsx'
 
 const router = createBrowserRouter([{
   path : "/",
@@ -23,6 +24,14 @@ const router = createBrowserRouter([{
     element : (
       <AuthLayout authencation={false}>
         <Register/>
+      </AuthLayout>
+      )
+  },
+  {
+    path : "addpost",
+    element : (
+      <AuthLayout authencation={false}>
+        <AddPost/>
       </AuthLayout>
       )
   }]
